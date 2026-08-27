@@ -42,7 +42,7 @@ function onWorldSelected(files: File[]) {
   if (dirs.length === 0) {
     worldError.value =
       "We couldn't find a playerdata (or players/data) folder inside what you selected. " +
-      "Select your world's save folder — the one containing level.dat — or select the " +
+      "Select your world's save folder (the one containing level.dat), or select the " +
       'playerdata folder directly.'
     return
   }
@@ -91,7 +91,7 @@ async function confirmReset() {
     })
 
     // Force the bar to a visible 100% and let it actually paint before
-    // switching steps — otherwise the final update and the step change can
+    // switching steps. Otherwise the final update and the step change can
     // land in the same render tick and the bar never appears full.
     zipProgress.value = 100
     await nextTick()

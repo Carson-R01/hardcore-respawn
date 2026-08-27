@@ -26,7 +26,7 @@ function openPicker() {
 
 async function onChange(event: Event) {
   const target = event.target as HTMLInputElement
-  // Copy into a plain array *before* resetting target.value below — in some
+  // Copy into a plain array *before* resetting target.value below. In some
   // browsers, clearing an <input type="file">'s value also empties out the
   // live FileList that .files returns, which would silently zero out any
   // reference to it taken beforehand.
@@ -54,8 +54,8 @@ async function onChange(event: Event) {
       <p class="dropzone__hint">
         Choose the world save folder (the one containing <code>level.dat</code>), or the
         <code>playerdata</code> / <code>players/data</code> folder directly. The download you get
-        back mirrors whatever you select here, so you can drop it back in as a full replacement —
-        selecting just the <code>playerdata</code> folder keeps that download small and fast;
+        back mirrors whatever you select here, so you can drop it back in as a full replacement.
+        Selecting just the <code>playerdata</code> folder keeps that download small and fast;
         selecting the whole world works too, but it copies everything (region files included), so
         it will take longer and use more memory for large worlds.
       </p>
@@ -67,7 +67,7 @@ async function onChange(event: Event) {
     </div>
 
     <p class="note">
-      Works best in Chrome, Edge, or Firefox. Nothing is read from a file until it's needed — large
+      Works best in Chrome, Edge, or Firefox. Nothing is read from a file until it's needed: large
       world files (regions, chunks) are never loaded into memory, only their names.
     </p>
   </div>

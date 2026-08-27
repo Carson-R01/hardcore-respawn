@@ -13,7 +13,7 @@ export interface ZipBuildOptions {
  * Builds the downloadable ZIP.
  *
  * RESET/<same relative path as the source> mirrors the *entire* folder the
- * user selected, with only the target player's files removed — so it's a
+ * user selected, with only the target player's files removed, so it's a
  * complete, drop-in replacement for whatever folder was selected.
  *
  * BACKUP/<same relative path> contains untouched copies of exactly the
@@ -21,7 +21,7 @@ export interface ZipBuildOptions {
  *
  * Files are handed to JSZip as-is (not pre-read into ArrayBuffers) so JSZip
  * streams each one from disk during generateAsync rather than holding every
- * file's bytes in memory at once — important once "world" can mean an
+ * file's bytes in memory at once. This matters once "world" can mean an
  * entire save folder, including multi-hundred-MB region files.
  */
 export async function buildResetZip(options: ZipBuildOptions): Promise<Blob> {

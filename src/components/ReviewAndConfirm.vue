@@ -53,7 +53,7 @@ function fileName(vf: VirtualFile): string {
       </ul>
 
       <AlertBanner v-if="!datFile || !datOldFile" type="warning">
-        Only one of the two player files was found. That's normal —
+        Only one of the two player files was found. That's normal:
         {{ !datFile ? 'no .dat file exists yet for this player' : 'no .dat_old backup exists yet' }}.
         The file that was found will still be removed.
       </AlertBanner>
@@ -70,7 +70,7 @@ function fileName(vf: VirtualFile): string {
           gamemode, ender chest, and any mod data stored in these files will be lost and recreated
           fresh the next time they join.
         </p>
-        <p>Your original world files are never modified — a backup of these exact files is included in the download.</p>
+        <p>Your original world files are never modified. A backup of these exact files is included in the download.</p>
         <div class="button-row">
           <button type="button" class="button button--ghost" :disabled="processing" @click="emit('cancel')">
             Cancel

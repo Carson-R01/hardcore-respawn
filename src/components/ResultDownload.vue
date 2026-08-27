@@ -32,20 +32,20 @@ const emit = defineEmits<{
         <li>Unzip <code>{{ zipFileName }}</code> somewhere on your computer.</li>
         <li>
           <code>RESET/{{ rootName }}</code> is a complete copy of everything you selected, with
-          only {{ profile.username }}'s player-data file(s) removed — nothing else was changed.
+          only {{ profile.username }}'s player-data file(s) removed; nothing else was changed.
           You can replace the original folder you selected with this one entirely.
         </li>
         <li>
           <strong>Important:</strong> only do a full replace if nobody has played the world since
-          you exported it — a full replace overwrites anything that changed since then (other
+          you exported it. A full replace overwrites anything that changed since then (other
           players logging in, world progress, etc.). If you're not sure, it's safer to just
           manually delete the file(s) listed above from your live world's
-          <code>{{ dir.dirRelativePath }}</code> folder instead — that has the same effect without
+          <code>{{ dir.dirRelativePath }}</code> folder instead; that has the same effect without
           touching anything else.
         </li>
         <li>
           The <code>BACKUP/</code> folder contains untouched copies of exactly the file(s) that
-          were removed. Keep it — if anything looks wrong, put those files back to restore
+          were removed. Keep it: if anything looks wrong, put those files back to restore
           {{ profile.username }}'s original data.
         </li>
       </ol>
