@@ -8,6 +8,7 @@ defineProps<{
   profile: MojangProfile
   dir: PlayerDataDir
   rootName: string
+  mode: 'delete' | 'revive'
 }>()
 
 const emit = defineEmits<{
@@ -17,7 +18,13 @@ const emit = defineEmits<{
 
 <template>
   <div class="result">
-    <AlertBanner type="success">
+    <AlertBanner v-if="mode === 'revive'" type="success">
+      {{ profile.username }}'s saved player data has been revived in a copy of
+      <code>{{ dir.dirRelativePath }}</code>: their dead/spectator state was cleared, but their
+      inventory, ender chest, XP, and everything else was kept. Your original world files were
+      never touched.
+    </AlertBanner>
+    <AlertBanner v-else type="success">
       {{ profile.username }}'s saved player data has been removed from a copy of
       <code>{{ dir.dirRelativePath }}</code>. Your original world files were never touched.
     </AlertBanner>
@@ -26,7 +33,26 @@ const emit = defineEmits<{
       Download {{ zipFileName }}
     </a>
 
-    <div class="instructions">
+    <div v-if="mode === 'revive'" class="instructions">
+      <h4>What to do with this ZIP</h4>
+      <ol>
+        <li>Unzip <code>{{ zipFileName }}</code> somewhere on your computer.</li>
+        <li>
+          <code>RESET/{{ rootName }}</code> is a complete copy of everything you selected, with
+          {{ profile.username }}'s player-data file edited in place; nothing else was changed. You
+          can replace the original folder you selected with this one entirely, or just drop the
+          single edited file back into your live world's <code>{{ dir.dirRelativePath }}</code>
+          folder in place of the existing one.
+        </li>
+        <li>
+          The <code>BACKUP/</code> folder contains an untouched copy of the original file before
+          it was edited. Keep it: if anything looks wrong, put it back to restore
+          {{ profile.username }}'s original data.
+        </li>
+      </ol>
+    </div>
+
+    <div v-else class="instructions">
       <h4>What to do with this ZIP</h4>
       <ol>
         <li>Unzip <code>{{ zipFileName }}</code> somewhere on your computer.</li>

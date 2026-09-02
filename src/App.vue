@@ -9,9 +9,10 @@ import StepIndicator from './components/StepIndicator.vue'
 import ProgressBar from './components/ProgressBar.vue'
 import { buildWorldData, findPlayerDataDirs, matchPlayerFiles } from './utils/worldFs'
 import { buildResetZip } from './utils/zipBuilder'
-import type { MojangProfile, PlayerDataDir, WorldData } from './types'
+import type { MojangProfile, PlayerDataDir, VirtualFile, WorldData } from './types'
 
 type Step = 'world' | 'select-dir' | 'player' | 'review' | 'done'
+type ActionMode = 'delete' | 'revive'
 
 const step = ref<Step>('world')
 
@@ -27,6 +28,7 @@ const zipProgress = ref<number | null>(null)
 const zipError = ref<string | null>(null)
 const zipUrl = ref<string | null>(null)
 const zipFileName = ref('')
+const lastActionMode = ref<ActionMode>('delete')
 
 const matched = computed(() => {
   if (!selectedDir.value || !profile.value) return null
@@ -72,23 +74,12 @@ function cancelReview() {
   step.value = 'player'
 }
 
-async function confirmReset() {
-  if (!world.value || !matched.value) return
-  const { datFile, datOldFile } = matched.value
-  if (!datFile && !datOldFile) return
-
+async function runZipBuild(buildFn: () => Promise<Blob>) {
   processing.value = true
   zipProgress.value = 0
   zipError.value = null
   try {
-    const blob = await buildResetZip({
-      world: world.value,
-      datFile,
-      datOldFile,
-      onProgress: (percent) => {
-        zipProgress.value = percent
-      },
-    })
+    const blob = await buildFn()
 
     // Force the bar to a visible 100% and let it actually paint before
     // switching steps. Otherwise the final update and the step change can
@@ -99,7 +90,8 @@ async function confirmReset() {
 
     if (zipUrl.value) URL.revokeObjectURL(zipUrl.value)
     zipUrl.value = URL.createObjectURL(blob)
-    zipFileName.value = `Hardcore-Player-Reset-${profile.value?.username ?? 'player'}.zip`
+    const verb = lastActionMode.value === 'revive' ? 'Revive' : 'Reset'
+    zipFileName.value = `Hardcore-Player-${verb}-${profile.value?.username ?? 'player'}.zip`
     step.value = 'done'
   } catch {
     zipError.value = 'Failed to generate the ZIP file. You can try again, or reload the page and start over.'
@@ -107,6 +99,40 @@ async function confirmReset() {
     processing.value = false
     zipProgress.value = null
   }
+}
+
+async function confirmDelete() {
+  const m = matched.value
+  if (!world.value || !m) return
+  const removeFiles = [m.datFile, m.datOldFile].filter((f): f is VirtualFile => !!f)
+  if (removeFiles.length === 0) return
+
+  lastActionMode.value = 'delete'
+  await runZipBuild(() =>
+    buildResetZip({
+      world: world.value!,
+      removeFiles,
+      onProgress: (percent) => {
+        zipProgress.value = percent
+      },
+    }),
+  )
+}
+
+async function confirmRevive(bytes: Uint8Array) {
+  const datFile = matched.value?.datFile
+  if (!world.value || !datFile) return
+
+  lastActionMode.value = 'revive'
+  await runZipBuild(() =>
+    buildResetZip({
+      world: world.value!,
+      replaceFiles: [{ file: datFile, newBytes: bytes }],
+      onProgress: (percent) => {
+        zipProgress.value = percent
+      },
+    }),
+  )
 }
 
 function restart() {
@@ -122,6 +148,7 @@ function restart() {
   zipError.value = null
   zipUrl.value = null
   zipFileName.value = ''
+  lastActionMode.value = 'delete'
 }
 
 onBeforeUnmount(() => {
@@ -169,7 +196,8 @@ onBeforeUnmount(() => {
         :dat-file="matched?.datFile"
         :dat-old-file="matched?.datOldFile"
         :processing="processing"
-        @confirm="confirmReset"
+        @confirm-delete="confirmDelete"
+        @confirm-revive="confirmRevive"
         @cancel="cancelReview"
       />
       <ProgressBar
@@ -188,6 +216,7 @@ onBeforeUnmount(() => {
         :profile="profile"
         :dir="selectedDir"
         :root-name="world.rootName"
+        :mode="lastActionMode"
         @restart="restart"
       />
     </section>
