@@ -6,7 +6,7 @@ import ReviewAndConfirm from './components/ReviewAndConfirm.vue'
 import ResultDownload from './components/ResultDownload.vue'
 import AlertBanner from './components/AlertBanner.vue'
 import StepIndicator from './components/StepIndicator.vue'
-import ProgressBar from './components/ProgressBar.vue'
+import MinecraftLoadingScreen from './components/MinecraftLoadingScreen.vue'
 import { buildWorldData, findPlayerDataDirs, matchPlayerFiles } from './utils/worldFs'
 import { buildResetZip } from './utils/zipBuilder'
 import type { MojangProfile, PlayerDataDir, VirtualFile, WorldData } from './types'
@@ -200,11 +200,7 @@ onBeforeUnmount(() => {
         @confirm-revive="confirmRevive"
         @cancel="cancelReview"
       />
-      <ProgressBar
-        v-if="processing"
-        :percent="zipProgress ?? undefined"
-        label="Generating ZIP…"
-      />
+      <MinecraftLoadingScreen v-if="processing" :percent="zipProgress ?? undefined" />
       <AlertBanner v-if="zipError" type="error">{{ zipError }}</AlertBanner>
     </section>
 
